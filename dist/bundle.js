@@ -43,16 +43,29 @@
       ],
       inventory: { bouncer: 1, well: 3, plank: 2 },
       hint: "Use gravity wells to pull the cat around obstacles!"
+    },
+    {
+      // Level 4 - Hot floor
+      startPipe: { x: 360, y: 0, w: 80, h: 60 },
+      basket: { x: 50, y: 200, w: 80, h: 55 },
+      walls: [
+        { x1: 0, y1: 310, x2: 280, y2: 310 },
+        { x1: 500, y1: 160, x2: 800, y2: 160 }
+      ],
+      spikes: [{ x: 0, y: 530, w: 800 }],
+      inventory: { bouncer: 2, well: 1, plank: 3 },
+      hint: "Don't touch the floor! Guide the cat to the left basket."
     }
   ];
 
   // src/constants.ts
   var GRAVITY = 0.38;
   var AIR_DAMPING = 0.995;
-  var WALL_RESTITUTION = 0.35;
+  var WALL_RESTITUTION = 0.45;
   var BOUNCER_IMPULSE = 14;
   var WELL_STRENGTH = 0.18;
   var WELL_RADIUS = 90;
+  var MAX_SPEED = 18;
 
   // src/physics.ts
   function circleSegmentCollision(cat2, seg) {
@@ -126,12 +139,19 @@
     cat2.vy += GRAVITY;
     cat2.vx *= AIR_DAMPING;
     cat2.vy *= AIR_DAMPING;
+    const speed = Math.sqrt(cat2.vx * cat2.vx + cat2.vy * cat2.vy);
+    if (speed > MAX_SPEED) {
+      const scale = MAX_SPEED / speed;
+      cat2.vx *= scale;
+      cat2.vy *= scale;
+    }
     cat2.x += cat2.vx;
     cat2.y += cat2.vy;
   }
+  var SPIKE_HEIGHT = 20;
   function catOnSpike(cat2, spikes) {
     for (const spike of spikes) {
-      if (cat2.x >= spike.x && cat2.x <= spike.x + spike.w && cat2.y >= spike.y - 40 && cat2.y <= spike.y) {
+      if (cat2.x + cat2.r > spike.x && cat2.x - cat2.r < spike.x + spike.w && cat2.y + cat2.r > spike.y - SPIKE_HEIGHT && cat2.y - cat2.r < spike.y) {
         return true;
       }
     }

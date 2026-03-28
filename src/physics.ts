@@ -1,5 +1,5 @@
 import type { Cat, Segment, Bouncer, GravWell, Spike, CollisionResult } from './types';
-import { GRAVITY, AIR_DAMPING, WALL_RESTITUTION, BOUNCER_IMPULSE, WELL_STRENGTH, WELL_RADIUS } from './constants';
+import { GRAVITY, AIR_DAMPING, WALL_RESTITUTION, BOUNCER_IMPULSE, WELL_STRENGTH, WELL_RADIUS, MAX_SPEED } from './constants';
 
 export function circleSegmentCollision(cat: Cat, seg: Segment): CollisionResult | null {
   const dx = seg.x2 - seg.x1;
@@ -92,17 +92,35 @@ export function stepCat(cat: Cat): void {
   cat.vy += GRAVITY;
   cat.vx *= AIR_DAMPING;
   cat.vy *= AIR_DAMPING;
+
+  // FIX: clamp speed to MAX_SPEED to prevent tunnelling through thin surfaces.
+  const speed = Math.sqrt(cat.vx * cat.vx + cat.vy * cat.vy);
+  if (speed > MAX_SPEED) {
+    const scale = MAX_SPEED / speed;
+    cat.vx *= scale;
+    cat.vy *= scale;
+  }
+
   cat.x += cat.vx;
   cat.y += cat.vy;
 }
 
+// Height of a spike triangle in pixels (must match the renderer's triHeight).
+const SPIKE_HEIGHT = 20;
+
+/**
+ * FIX: use the cat's radius for accurate circle-vs-spike-strip detection.
+ * The old code used a hard-coded 40 px vertical window based on the cat
+ * *centre*, which fired too early (false positives above the spike tips).
+ * The corrected version tests the cat's lowest/left/right edges.
+ */
 export function catOnSpike(cat: Cat, spikes: Spike[]): boolean {
   for (const spike of spikes) {
     if (
-      cat.x >= spike.x &&
-      cat.x <= spike.x + spike.w &&
-      cat.y >= spike.y - 40 &&
-      cat.y <= spike.y
+      cat.x + cat.r > spike.x &&
+      cat.x - cat.r < spike.x + spike.w &&
+      cat.y + cat.r > spike.y - SPIKE_HEIGHT &&
+      cat.y - cat.r < spike.y
     ) {
       return true;
     }

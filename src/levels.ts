@@ -37,4 +37,16 @@ export const LEVELS: LevelDef[] = [
     inventory: { bouncer: 1, well: 3, plank: 2 },
     hint: 'Use gravity wells to pull the cat around obstacles!',
   },
+  {
+    // Level 4 - Hot floor
+    startPipe: { x: 360, y: 0, w: 80, h: 60 },
+    basket: { x: 50, y: 200, w: 80, h: 55 },
+    walls: [
+      { x1: 0,   y1: 310, x2: 280, y2: 310 },
+      { x1: 500, y1: 160, x2: 800, y2: 160 },
+    ],
+    spikes: [{ x: 0, y: 530, w: 800 }],
+    inventory: { bouncer: 2, well: 1, plank: 3 },
+    hint: "Don't touch the floor! Guide the cat to the left basket.",
+  },
 ];
