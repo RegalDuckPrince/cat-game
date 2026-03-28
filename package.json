@@ -1,0 +1,13 @@
+{
+  "name": "cat-game",
+  "version": "1.0.0",
+  "description": "Gravity Feline - A physics puzzle game",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --outfile=dist/bundle.js",
+    "dev": "esbuild src/main.ts --bundle --outfile=dist/bundle.js --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.2",
+    "typescript": "^5.4.5"
+  }
+}
